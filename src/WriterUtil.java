@@ -3,6 +3,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import config.Config;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -172,10 +173,22 @@ public class WriterUtil extends WriteCommandAction.Simple {
             String typeStr = typeByValue(mClass, key, type, true);
 
             if (Config.getInstant().isFieldPrivateMode()) {
+
+
                 filedSb.append("//").append(json.get(key)).append("\n");
+                if (isBinding) {
+                    filedSb.append("@Bindable").append("\n");
+                }
+                //全小写
+             //   filedSb.append("private  ").append(typeStr).append(StringUtils.lowerCase(key)).append(" ; ");
+                //不改大小写
                 filedSb.append("private  ").append(typeStr).append(key).append(" ; ");
             } else {
                 filedSb.append("//").append(json.get(key)).append("\n");
+                if (isBinding) {
+                    filedSb.append("@Bindable").append("\n");
+                }
+              //  filedSb.append("public  ").append(typeStr).append(StringUtils.lowerCase(key)).append(" ; ");
                 filedSb.append("public  ").append(typeStr).append(key).append(" ; ");
             }
             String filedStr = null;
@@ -291,15 +304,13 @@ public class WriterUtil extends WriteCommandAction.Simple {
             Object type = json.get(key);
             String typeStr;
             typeStr = typeByValue(mClass, field, type);
-            if (isBinding){
+            if (isBinding) {
                 String method = "public void  set" + captureName(field) + "( " + typeStr + " " + field + ") {   this." + field + " = " + field + ";\n notifyPropertyChanged(BR." + field + ");} ";
                 mClass.add(mFactory.createMethodFromText(method, mClass));
-            }else {
+            } else {
                 String method = "public void  set" + captureName(field) + "( " + typeStr + " " + field + ") {   this." + field + " = " + field + " ;} ";
                 mClass.add(mFactory.createMethodFromText(method, mClass));
             }
-
-
 
 
         }
@@ -317,6 +328,7 @@ public class WriterUtil extends WriteCommandAction.Simple {
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
             String field = fields.get(i);
+            //String field = StringUtils.lowerCase(fields.get(i));
             Object type = json.get(key);
             String typeStr;
             typeStr = typeByValue(mClass, field, type);
@@ -324,20 +336,20 @@ public class WriterUtil extends WriteCommandAction.Simple {
             if (type instanceof Boolean) {
 
                 String method;
-                if (isBinding) {
-                      method = "@Bindable\npublic " + typeStr + "   is" + captureName(field) + "() {   return " + field + " ;} ";
-                } else {
-                      method = "public " + typeStr + "   is" + captureName(field) + "() {   return " + field + " ;} ";
-                }
+//                if (isBinding) {
+//                      method = "@Bindable\npublic " + typeStr + "   is" + captureName(field) + "() {   return " + field + " ;} ";
+//                } else {
+                method = "public " + typeStr + "   is" + captureName(field) + "() {   return " + field + " ;} ";
+//                }
                 mClass.add(mFactory.createMethodFromText(method, mClass));
             } else {
                 String method;
-                if (isBinding) {
+//                if (isBinding) {
 
-                      method = "@Bindable\npublic " + typeStr + "   get" + captureName(field) + "() {   return " + field + " ;} ";
-                }else {
-                      method = "public " + typeStr + "   get" + captureName(field) + "() {   return " + field + " ;} ";
-                }
+//                    method = "public " + typeStr + "   get" + captureName(field) + "() {   return " + field + " ;} ";
+//                } else {
+                method = "public " + typeStr + "   get" + captureName(field) + "() {   return " + field + " ;} ";
+//                }
                 mClass.add(mFactory.createMethodFromText(method, mClass));
             }
 
