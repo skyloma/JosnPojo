@@ -39,7 +39,7 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action    id="PojoAction" class="PojoAction" text="生成POJO数据绑定"
+    <action    id="PojoAction" class="PojoAction" text="生成POJO"
             >
 
       <add-to-group group-id="GenerateGroup" anchor="first"/>

@@ -13,23 +13,24 @@ public class JsonUtilsDialog extends JFrame {
     private JButton cancel;
     private JLabel label22;
     private JTextPane textPane1;
-    private boolean isbinding=true;
+    private boolean isbinding=false;
+
 
     protected PsiClass mClass;
     protected PsiElementFactory mFactory;
     protected PsiFile mFile;
     protected Project project;
 
-    private void askBinding() {
-        int i = Messages.showYesNoDialog("你要使用databinding吗", "你要使用databinding吗", Messages.getQuestionIcon());
-        if (i == Messages.OK) {
-            isbinding = true;
-        }else {
-            isbinding=false;
-        }
-
-
-    }
+//    private void askBinding() {
+//        int i = Messages.showYesNoDialog("你要使用databinding吗", "你要使用databinding吗", Messages.getQuestionIcon());
+//        if (i == Messages.OK) {
+//            isbinding = true;
+//        }else {
+//            isbinding=false;
+//        }
+//
+//
+//    }
 
     public JsonUtilsDialog() {
         setContentPane(contentPane2);
@@ -41,7 +42,7 @@ public class JsonUtilsDialog extends JFrame {
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                askBinding();
+//                askBinding();
                 onOK();
             }
         });
@@ -92,7 +93,7 @@ public class JsonUtilsDialog extends JFrame {
     private void onOK() {
 
         String jsonSTR = textPane1.getText().toString();
-        new WriterUtil(isbinding,this, label22, jsonSTR, mFile, project, mClass).execute();
+        new WriterUtil(this, label22, jsonSTR, mFile, project, mClass).execute();
 
     }
 

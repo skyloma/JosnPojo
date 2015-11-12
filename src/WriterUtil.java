@@ -30,14 +30,14 @@ public class WriterUtil extends WriteCommandAction.Simple {
     private String jsonStr;
     private JFrame jDialog;
     private JLabel jLabel;
-    private boolean isBinding;
+//    private boolean isBinding;
     private List<String> keyWordList = new ArrayList<String>();
 
-    public WriterUtil(boolean isBinding, JFrame jDialog, JLabel jLabel,
+    public WriterUtil ( JFrame jDialog, JLabel jLabel,
                       String jsonStr, PsiFile mFile, Project project, PsiClass mClass, PsiFile... files) {
         super(project, files);
 
-        this.isBinding = isBinding;
+
         mFactory = JavaPsiFacade.getElementFactory(project);
         this.mFile = mFile;
         this.jLabel = jLabel;
@@ -158,36 +158,19 @@ public class WriterUtil extends WriteCommandAction.Simple {
 
         for (int i = 0; i < list.size(); i++) {
             String key = list.get(i);
-
             Object type = json.get(key);
             StringBuilder filedSb = new StringBuilder();
-            if (checkKeyWord(key)) {
-                filedSb.append("@com.google.gson.annotations.SerializedName(\"" + key + "\")\n");
-                key = key + "X";
-            } else {
-                if (Config.getInstant().isUseSerializedName()) {
-                    filedSb.append("@com.google.gson.annotations.SerializedName(\"" + key + "\")\n");
-                }
-            }
             fields.add(key);
             String typeStr = typeByValue(mClass, key, type, true);
 
             if (Config.getInstant().isFieldPrivateMode()) {
 
-
-                filedSb.append("//").append(json.get(key)).append("\n");
-                if (isBinding) {
-                    filedSb.append("@Bindable").append("\n");
-                }
                 //全小写
              //   filedSb.append("private  ").append(typeStr).append(StringUtils.lowerCase(key)).append(" ; ");
                 //不改大小写
                 filedSb.append("private  ").append(typeStr).append(key).append(" ; ");
             } else {
-                filedSb.append("//").append(json.get(key)).append("\n");
-                if (isBinding) {
-                    filedSb.append("@Bindable").append("\n");
-                }
+
               //  filedSb.append("public  ").append(typeStr).append(StringUtils.lowerCase(key)).append(" ; ");
                 filedSb.append("public  ").append(typeStr).append(key).append(" ; ");
             }
@@ -197,6 +180,7 @@ public class WriterUtil extends WriteCommandAction.Simple {
             } else {
                 filedStr = filedSb.toString();
             }
+
             mClass.add(mFactory.createFieldFromText(filedStr, mClass));
         }
         return fields;
@@ -304,13 +288,10 @@ public class WriterUtil extends WriteCommandAction.Simple {
             Object type = json.get(key);
             String typeStr;
             typeStr = typeByValue(mClass, field, type);
-            if (isBinding) {
-                String method = "public void  set" + captureName(field) + "( " + typeStr + " " + field + ") {   this." + field + " = " + field + ";\n notifyPropertyChanged(BR." + field + ");} ";
-                mClass.add(mFactory.createMethodFromText(method, mClass));
-            } else {
+
                 String method = "public void  set" + captureName(field) + "( " + typeStr + " " + field + ") {   this." + field + " = " + field + " ;} ";
                 mClass.add(mFactory.createMethodFromText(method, mClass));
-            }
+
 
 
         }
@@ -334,22 +315,21 @@ public class WriterUtil extends WriteCommandAction.Simple {
             typeStr = typeByValue(mClass, field, type);
 
             if (type instanceof Boolean) {
-
                 String method;
-//                if (isBinding) {
-//                      method = "@Bindable\npublic " + typeStr + "   is" + captureName(field) + "() {   return " + field + " ;} ";
-//                } else {
-                method = "public " + typeStr + "   is" + captureName(field) + "() {   return " + field + " ;} ";
-//                }
+                method="/**" +"\n"+
+                        "* @return " +   json.get(field) +"\n"+
+                        "*/"+"\n";
+                method += "public " + typeStr + "   is" + captureName(field) + "() {   return " + field + " ;} ";
+
                 mClass.add(mFactory.createMethodFromText(method, mClass));
             } else {
                 String method;
-//                if (isBinding) {
+                method="/**" +"\n"+
+                        "* @return " +   json.get(field) +"\n"+
+                        "*/"+"\n";
 
-//                    method = "public " + typeStr + "   get" + captureName(field) + "() {   return " + field + " ;} ";
-//                } else {
-                method = "public " + typeStr + "   get" + captureName(field) + "() {   return " + field + " ;} ";
-//                }
+                method += "public " + typeStr + "   get" + captureName(field) + "() {   return " + field + " ;} ";
+
                 mClass.add(mFactory.createMethodFromText(method, mClass));
             }
 
